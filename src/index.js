@@ -2,7 +2,7 @@ import express from 'express';
 import fileUpload from 'express-fileupload';
 import './database.js';
 
-import Routes from './routes/index.js';
+import Router from './routes';
 
 const app = express();
 
@@ -26,7 +26,7 @@ app.use(
 //routes
 // app.use(videoRoutes);
 
-app.use('/', Routes);
+app.use('/', Router);
 
 app.listen(3000);
 console.log('Server on port', 3000);

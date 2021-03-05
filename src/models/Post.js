@@ -1,7 +1,7 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from "mongoose";
 
 export default model(
-  'Post',
+  "Post",
   new Schema({
     name: {
       type: String,
