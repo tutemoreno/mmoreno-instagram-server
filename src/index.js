@@ -2,7 +2,7 @@ import express from 'express';
 import fileUpload from 'express-fileupload';
 import './database.js';
 
-import Router from './routes';
+import Router from './routes/index.js';
 
 const app = express();
 
@@ -24,8 +24,6 @@ app.use(
 );
 
 //routes
-// app.use(videoRoutes);
-
 app.use('/', Router);
 
 app.listen(3000);

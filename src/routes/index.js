@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import accountsRouter from './accounts';
+import accountsRouter from './accounts.js';
 
 const router = Router();
 

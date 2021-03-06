@@ -1,8 +1,7 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose';
 
-export default model(
-  "Post",
-  new Schema({
+const Post = new Schema(
+  {
     name: {
       type: String,
       required: true,
@@ -24,5 +23,8 @@ export default model(
       type: String,
       required: true,
     },
-  })
+  },
+  { timestamps: true }
 );
+
+export default model('Post', Post);
