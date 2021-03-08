@@ -11,18 +11,6 @@ const Post = new Schema(
       required: true,
       unique: true,
     },
-    videoCodec: {
-      type: String,
-      required: true,
-    },
-    audioCodec: {
-      type: String,
-      required: true,
-    },
-    duration: {
-      type: String,
-      required: true,
-    },
   },
   { timestamps: true }
 );
