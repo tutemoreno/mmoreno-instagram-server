@@ -1,16 +1,24 @@
-import { Schema, model } from 'mongoose';
+import mongoose from 'mongoose';
+
+const { Schema, model } = mongoose;
 
 const Post = new Schema(
   {
-    name: {
+    description: {
       type: String,
       required: true,
     },
-    path: {
+    fileName: {
       type: String,
       required: true,
       unique: true,
     },
+    likes: [
+      {
+        ref: 'User',
+        type: Schema.Types.ObjectId,
+      },
+    ],
   },
   { timestamps: true }
 );

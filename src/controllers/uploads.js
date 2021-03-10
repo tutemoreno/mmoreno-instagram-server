@@ -1,6 +1,5 @@
 import fs from 'fs';
 
-import File from '../models/file.js';
 import Post from '../models/post.js';
 
 import path from 'path';
@@ -25,8 +24,7 @@ export async function deletePost(req, res) {
   const post = await Post.findByIdAndDelete(req.params.id);
 
   try {
-    fs.unlinkSync(path.join(__dirname, 'uploads', post.file.path));
-    fs.unlinkSync(path.join(__dirname, 'thumbs', `${post.file.path}.png`));
+    fs.unlinkSync(path.join(__dirname, 'uploads', post.fileName));
   } catch (err) {
     console.error(err);
   } finally {
@@ -40,7 +38,6 @@ export async function deleteAllPosts(req, res) {
   for (const post of posts) {
     try {
       fs.unlinkSync(path.join(__dirname, 'uploads', post.file.path));
-      fs.unlinkSync(path.join(__dirname, 'thumbs', `${post.file.path}.png`));
     } catch (err) {
       console.error(err);
     }
@@ -52,22 +49,22 @@ export async function deleteAllPosts(req, res) {
 export async function createPost(req, res) {
   const tmpFile = req.files.file,
     fileName = String(Date.now()),
-    newPathFile = path.join('uploads', fileName);
+    filePath = path.join('uploads', fileName),
+    { description } = req.body;
 
-  if (fs.existsSync(path.join(__dirname, 'uploads'))) {
-    console.log('Directory exists!');
-  } else {
-    console.log('Directory not found.');
-    fs.mkdirSync(path.join(__dirname, 'uploads'));
+  const post = new Post({ fileName, description });
+
+  try {
+    const fileSaved = await post.save();
+
+    if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
+      fs.mkdirSync(path.join(__dirname, 'uploads'));
+    }
+
+    await tmpFile.mv(filePath);
+
+    res.json({ post: fileSaved });
+  } catch (error) {
+    res.json(error);
   }
-
-  await tmpFile.mv(newPathFile);
-
-  const post = new Post({
-    path: fileName,
-  });
-
-  const fileSaved = await post.save();
-
-  res.json({ post: fileSaved });
 }
