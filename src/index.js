@@ -1,5 +1,9 @@
 import express from 'express';
 import fileUpload from 'express-fileupload';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 import './database.js';
 
 import Router from './routes/index.js';
