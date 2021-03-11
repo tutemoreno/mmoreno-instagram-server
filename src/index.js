@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-import './database.js';
+import './database';
 
 import Router from './routes/index.js';
 

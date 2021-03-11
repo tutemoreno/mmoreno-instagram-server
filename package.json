@@ -2,10 +2,10 @@
   "name": "mmoreno-instagram-server",
   "version": "1.0.0",
   "description": "something similar to instagram",
-  "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/index.js",
+    "start": "nodemon src/index.js --exec babel-node",
+    "build": "babel src --out-dir dist",
     "test": "test"
   },
   "repository": {
@@ -28,6 +28,10 @@
     "mongoose": "^5.11.18"
   },
   "devDependencies": {
+    "@babel/cli": "^7.13.10",
+    "@babel/core": "^7.13.10",
+    "@babel/node": "^7.13.10",
+    "@babel/preset-env": "^7.13.10",
     "nodemon": "^2.0.7"
   }
 }
