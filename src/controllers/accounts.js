@@ -56,6 +56,23 @@ export async function signIn(req, res) {
   res.json({ token });
 }
 
+async function socialSignIn(req, res) {
+  const { USER_ID, MODE } = req.AUTH;
+
+  const userFound = await User.findOne({ username: USER_ID, mode: MODE });
+
+  if (userFound) return res.status(200).json({ message: 'Already registered' });
+
+  const newUser = new User({
+    username: USER_ID,
+    mode: MODE,
+  });
+
+  await newUser.save();
+
+  res.status(200).json({ message: 'Register successful' });
+}
+
 async function serverSignIn(req, res) {
   const { username, password } = req.body;
 
@@ -91,12 +108,15 @@ async function facebookSignIn(req, res) {
   return { id };
 }
 
-async function googleSigIn(req, res) {
+async function googleSignIn(req, res) {
   const { token } = req.body;
 
-  const response = await axios.get(`https://oauth2.googleapis.com/tokeninfo`, {
-    params: { id_token: token },
-  });
+  const response = await axios.get(
+    `https://www.googleapis.com/oauth2/v3/tokeninfo`,
+    {
+      params: { access_token: token },
+    }
+  );
 
   if (!response.data)
     return res.status(401).json({ errors: [{ message: 'Invalid token' }] });

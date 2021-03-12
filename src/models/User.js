@@ -12,6 +12,12 @@ const User = new Schema(
     },
     password: {
       type: String,
+      required: () => {
+        return this.mode !== 'SERVER';
+      },
+    },
+    mode: {
+      type: String,
       required: true,
     },
   },

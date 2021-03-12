@@ -4,9 +4,9 @@
   "description": "something similar to instagram",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/index.js --exec babel-node",
+    "start": "nodemon src/index.js --exec node_modules/.bin/babel-node.cmd",
     "build": "babel src --out-dir dist",
-    "test": "test"
+    "test": "nodemon src/test.js --exec node_modules/.bin/babel-node.cmd"
   },
   "repository": {
     "type": "git",
