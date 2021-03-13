@@ -1,3 +1,1 @@
-import { verifyToken } from './auth.js';
-
-export { verifyToken };
+export * from './auth';

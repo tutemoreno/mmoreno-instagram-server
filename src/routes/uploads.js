@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { createPost, deletePost } from '../controllers/uploads.js';
-import { verifyToken } from '../middlewares/index.js';
+import { verifyToken } from '../middlewares';
 
 const router = Router();
 

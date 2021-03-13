@@ -1,127 +1,76 @@
-import axios from 'axios';
+import jwt from 'jsonwebtoken';
+import User from '../models/User';
 
-export async function signUp(req, res) {
-  const { username, password } = req.body;
+export async function checkIfAlreadyExists(req, res) {
+  const { username } = req.body;
 
-  const newUser = new User({
-    username,
-    password: User.encryptPassword(password),
-  });
+  const userFound = await User.findOne({ username });
 
-  const savedUser = await newUser.save();
+  if (userFound)
+    return res.json({ exists: true, message: 'User already exists' });
 
-  // expiresIn 5m
-  const token = jwt.sign(
-    { id: savedUser._id, accessMode: 'server' },
-    config.SECRET,
-    {
-      expiresIn: 300,
-    }
-  );
-
-  res.json({ token });
+  res.json({ exists: false });
 }
 
-export async function signIn(req, res) {
-  const { accessMode } = req.body;
-
-  let auth;
-
-  switch (accessMode) {
-    case 'server':
-      auth = await serverSignIn(req, res);
-
-      break;
-
-    case 'facebook':
-      auth = await facebookSignIn(req, res);
-
-      break;
-
-    case 'google':
-      auth = await googleSignIn(req, res);
-
-      break;
-
-    default:
-      break;
-  }
-
-  auth.accessMode = accessMode;
-
-  const token = jwt.sign(auth, config.SECRET, {
-    expiresIn: 300,
-  });
-
-  res.json({ token });
-}
-
-async function socialSignIn(req, res) {
-  const { USER_ID, MODE } = req.AUTH;
-
-  const userFound = await User.findOne({ username: USER_ID, mode: MODE });
-
-  if (userFound) return res.status(200).json({ message: 'Already registered' });
-
-  const newUser = new User({
-    username: USER_ID,
-    mode: MODE,
-  });
-
-  await newUser.save();
-
-  res.status(200).json({ message: 'Register successful' });
-}
-
-async function serverSignIn(req, res) {
+export async function serverSignUp(req, res) {
   const { username, password } = req.body;
 
   const userFound = await User.findOne({ username });
 
-  if (!userFound) return res.json({ errors: [{ message: 'User not found' }] });
+  if (userFound) return res.json({ message: 'User already exists' });
+
+  const newUser = new User({
+    username,
+    password: await User.encryptPassword(password),
+    mode: 'SERVER',
+  });
+
+  try {
+    await newUser.save();
+  } catch (error) {
+    if (error) res.json(error);
+  }
+
+  res.json({ success: true, message: 'Register successful' });
+}
+
+export async function serverSignIn(req, res) {
+  const { username, password } = req.body;
+
+  const userFound = await User.findOne({ username });
+
+  if (!userFound) return res.json({ message: 'User not found' });
 
   const matchPassword = await User.comparePassword(
     password,
     userFound.password
   );
 
-  if (!matchPassword)
-    return res
-      .status(401)
-      .json({ token: null, errors: [{ message: 'Invalid password' }] });
+  if (!matchPassword) return res.json({ message: 'Invalid password' });
 
-  return { id: userFound._id };
+  // expiresIn 1h
+  const token = jwt.sign({ id: userFound._id }, 'mmoreno-app', {
+    expiresIn: 3600,
+  });
+
+  res.json({ success: true, token, message: 'LoggedIn' });
 }
 
-async function facebookSignIn(req, res) {
-  const { userID, token } = req.body;
+export async function socialSignIn(req, res) {
+  const { USER_ID, MODE } = req.AUTH;
 
-  const response = await axios.get(
-    `https://graph.facebook.com/v10.0/${userID}?access_token=${token}`
-  );
+  if (USER_ID) return res.json({ success: true, message: 'LoggedIn' });
 
-  if (!response.data)
-    return res.status(401).json({ errors: [{ message: 'Invalid token' }] });
+  const newUser = new User({
+    username: req.headers['access-social-id'],
+    mode: MODE,
+  });
 
-  const { id } = response.data;
+  try {
+    await newUser.save();
+  } catch (error) {
+    if (error) res.json(error);
+  }
 
-  return { id };
-}
-
-async function googleSignIn(req, res) {
-  const { token } = req.body;
-
-  const response = await axios.get(
-    `https://www.googleapis.com/oauth2/v3/tokeninfo`,
-    {
-      params: { access_token: token },
-    }
-  );
-
-  if (!response.data)
-    return res.status(401).json({ errors: [{ message: 'Invalid token' }] });
-
-  const { sub } = response.data;
-
-  return { id: sub };
+  res.json({ success: true, message: 'Register successful' });
 }

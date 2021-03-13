@@ -12,9 +12,6 @@ const User = new Schema(
     },
     password: {
       type: String,
-      required: () => {
-        return this.mode !== 'SERVER';
-      },
     },
     mode: {
       type: String,
@@ -23,6 +20,10 @@ const User = new Schema(
   },
   { timestamps: true }
 );
+
+User.path('password').required(function () {
+  return this.mode === 'SERVER';
+}, 'Password required');
 
 User.statics.encryptPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);

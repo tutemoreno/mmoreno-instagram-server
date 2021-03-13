@@ -1,11 +1,13 @@
 import axios from 'axios';
-const token =
-    'ya29.a0AfH6SMB3SO94EiAv9uP2eMsvVobbvy49NPiMjZXZxyuzwctWKq7nRPE-Ab86E0VV6iK4onQ2AS-Cj4ZYNpwCQz6aEwiDK-13wtXbASb9jfWEpHNVooFEEB1tAOucTqwEJMk2iI9iGlKBO6LHrcsM0miidM0D',
+import jwt from 'jsonwebtoken';
+import PEM from './googlePEM.json';
+const token = 'asdasd',
   mode = 'FACEBOOK',
-  userID = '10222901989005749',
-  secret = '856dbf7ef1ad2c29587db26fe173cf60';
+  CLIENT_ID =
+    '61568487421-dn6ajb4a6e5cdfa1kichmt9bkhkbapch.apps.googleusercontent.com';
 
-getAccess(token);
+// getAccess(token);
+verify();
 
 async function getAccess(token) {
   const response = await axios.get(
