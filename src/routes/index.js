@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import accountsRouter from './accounts.js';
-import uploadsRouter from './uploads.js';
+import accountsRouter from './accounts';
+import postsRouter from './posts';
 
 const router = Router();
 
 router.use('/accounts', accountsRouter);
-router.use('/uploads', uploadsRouter);
+router.use('/posts', postsRouter);
 
 export default router;

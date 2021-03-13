@@ -11,14 +11,14 @@ export const verifyToken = async (req, res, next) => {
   let userId, response;
 
   if (!token || !mode)
-    return res.status(403).json({ errors: [{ message: 'No token provided' }] });
+    return res.status(401).json({ message: 'No token provided' });
 
   switch (mode) {
     case 'SERVER':
       try {
         userId = jwt.verify(token, 'mmoreno-app');
       } catch (error) {
-        return res.status(401).json({ errors: [{ message: 'Unauthorized' }] });
+        return res.status(401).json({ message: 'Unauthorized' });
       }
       break;
 
@@ -28,7 +28,7 @@ export const verifyToken = async (req, res, next) => {
       );
 
       if (!response.data)
-        return res.status(401).json({ errors: [{ message: 'Unauthorized' }] });
+        return res.status(401).json({ message: 'Unauthorized' });
 
       userId = await User.findOne({
         username: response.data.id,
@@ -46,7 +46,7 @@ export const verifyToken = async (req, res, next) => {
       );
 
       if (!response.data)
-        return res.status(401).json({ errors: [{ message: 'Unauthorized' }] });
+        return res.status(401).json({ message: 'Unauthorized' });
 
       userId = await User.findOne({
         username: response.data.sub,

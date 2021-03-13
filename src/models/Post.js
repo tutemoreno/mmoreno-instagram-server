@@ -13,6 +13,11 @@ const Post = new Schema(
       required: true,
       unique: true,
     },
+    owner: {
+      required: true,
+      ref: 'User',
+      type: Schema.Types.ObjectId,
+    },
     likes: [
       {
         ref: 'User',

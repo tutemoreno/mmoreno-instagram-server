@@ -1,11 +1,13 @@
 import { Router } from 'express';
 
-import { createPost, deletePost } from '../controllers/uploads.js';
+import { createPost, deletePost, getPosts } from '../controllers/posts';
 import { verifyToken } from '../middlewares';
 
 const router = Router();
 
 router.post('', verifyToken, createPost);
+
+router.get('', verifyToken, getPosts);
 
 router.delete('', verifyToken, deletePost);
 
