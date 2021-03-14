@@ -7,15 +7,17 @@ import path from 'path';
 const __dirname = path.resolve();
 
 export async function getImage(req, res) {
-  const file = await File.findById(req.params.id);
+  const post = await Post.findById(req.params.id);
 
-  res.sendFile(path.join(__dirname, 'uploads', file.path));
+  res.sendFile(path.join(__dirname, 'uploads', post.fileName));
 }
 
 export async function getPosts(req, res) {
   const search = req.query.search || '';
 
-  const posts = await Post.find({ name: { $regex: search } });
+  const posts = await Post.find({ description: { $regex: search } });
+
+  console.log(posts);
 
   res.json({ posts });
 }
@@ -48,22 +50,20 @@ export async function deleteAllPosts(req, res) {
 
 export async function createPost(req, res) {
   const tmpFile = req.files.file,
-    fileName = String(Date.now()),
-    filePath = path.join('uploads', fileName),
-    { description } = req.body;
+    { description, uuid } = req.body;
 
-  const post = new Post({ fileName, description });
+  const post = new Post({
+    fileName: uuid,
+    description,
+    owner: req.AUTH.USER_ID,
+  });
 
   try {
-    const fileSaved = await post.save();
+    const postSaved = await post.save();
 
-    if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
-      fs.mkdirSync(path.join(__dirname, 'uploads'));
-    }
+    await tmpFile.mv(path.join('uploads', uuid));
 
-    await tmpFile.mv(filePath);
-
-    res.json({ post: fileSaved });
+    res.json({ post: postSaved });
   } catch (error) {
     res.json(error);
   }

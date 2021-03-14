@@ -8,61 +8,58 @@ export const verifyToken = async (req, res, next) => {
     mode = req.headers['access-mode'],
     socialId = req.headers['access-social-id'];
 
-  let userId, response;
+  let user, response;
 
   if (!token || !mode)
     return res.status(401).json({ message: 'No token provided' });
 
-  switch (mode) {
-    case 'SERVER':
-      try {
-        userId = jwt.verify(token, 'mmoreno-app');
-      } catch (error) {
-        return res.status(401).json({ message: 'Unauthorized' });
-      }
-      break;
+  try {
+    switch (mode) {
+      case 'SERVER':
+        user = jwt.verify(token, 'mmoreno-app');
 
-    case 'FACEBOOK':
-      response = await axios.get(
-        `https://graph.facebook.com/v10.0/${socialId}?access_token=${token}`
-      );
+        break;
 
-      if (!response.data)
-        return res.status(401).json({ message: 'Unauthorized' });
+      case 'FACEBOOK':
+        response = await axios.get(
+          `https://graph.facebook.com/v10.0/${socialId}?access_token=${token}`
+        );
 
-      userId = await User.findOne({
-        username: response.data.id,
-        mode,
-      })._id;
+        user = await User.findOne({
+          username: response.data.id,
+          mode,
+        });
 
-      break;
+        break;
 
-    case 'GOOGLE':
-      response = await axios.get(
-        `https://www.googleapis.com/oauth2/v3/tokeninfo`,
-        {
-          params: { access_token: token },
-        }
-      );
+      case 'GOOGLE':
+        response = await axios.get(
+          `https://www.googleapis.com/oauth2/v3/tokeninfo`,
+          {
+            params: { access_token: token },
+          }
+        );
 
-      if (!response.data)
-        return res.status(401).json({ message: 'Unauthorized' });
+        user = await User.findOne({
+          username: response.data.sub,
+          mode,
+        });
 
-      userId = await User.findOne({
-        username: response.data.sub,
-        mode,
-      })._id;
+        break;
 
-      break;
-
-    default:
-      break;
+      default:
+        break;
+    }
+  } catch (error) {
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 
   req.AUTH = {
-    USER_ID: userId,
+    USER_ID: user ? user._id : null,
     MODE: mode,
   };
+
+  console.log('[AUTH]', req.AUTH);
 
   next();
 };

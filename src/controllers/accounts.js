@@ -49,7 +49,7 @@ export async function serverSignIn(req, res) {
   if (!matchPassword) return res.json({ message: 'Invalid password' });
 
   // expiresIn 1h
-  const token = jwt.sign({ id: userFound._id }, 'mmoreno-app', {
+  const token = jwt.sign({ _id: userFound._id }, 'mmoreno-app', {
     expiresIn: 3600,
   });
 
