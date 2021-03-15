@@ -17,7 +17,7 @@ router.post('/:id/like', verifyToken, like);
 
 router.post('/:id/unlike', verifyToken, unlike);
 
-router.get('', verifyToken, getPosts);
+router.get('/:perPage/:page', verifyToken, getPosts);
 
 router.get('/:id', getImage);
 

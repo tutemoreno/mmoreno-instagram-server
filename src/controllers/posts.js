@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 import Post from '../models/post.js';
 
 import path from 'path';
@@ -13,11 +11,18 @@ export async function getImage(req, res) {
 }
 
 export async function getPosts(req, res) {
-  const search = req.query.search || '';
+  const search = req.query.search || '',
+    { perPage, page } = req.params;
 
-  const posts = await Post.find({ description: { $regex: search } });
+  const posts = await Post.find({ description: { $regex: search } })
+      .sort({
+        createdAt: 'desc',
+      })
+      .limit(Number(perPage))
+      .skip(perPage * page),
+    count = await Post.count();
 
-  let response = { posts: [] };
+  let response = { posts: [], count };
 
   for (const post of posts) {
     const json = post.toJSON();
@@ -57,12 +62,12 @@ export async function unlike(req, res) {
 
   const postSaved = await post.save();
 
-  const json = post.toJSON();
+  const json = postSaved.toJSON();
 
   json.liked = false;
   json.likes = json.likes.length;
 
-  res.send({ post: postSaved });
+  res.send({ post: json });
 }
 
 /* export async function deletePost(req, res) {
