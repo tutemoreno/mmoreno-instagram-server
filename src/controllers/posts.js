@@ -17,12 +17,55 @@ export async function getPosts(req, res) {
 
   const posts = await Post.find({ description: { $regex: search } });
 
-  console.log(posts);
+  let response = { posts: [] };
 
-  res.json({ posts });
+  for (const post of posts) {
+    const json = post.toJSON();
+
+    json.liked = json.likes.some((objId) => {
+      return objId.equals(req.AUTH.USER_ID);
+    });
+    json.likes = json.likes.length;
+
+    response.posts.push(json);
+  }
+
+  res.send(response);
 }
 
-export async function deletePost(req, res) {
+export async function like(req, res) {
+  const post = await Post.findById(req.params.id);
+
+  post.likes.push(req.AUTH.USER_ID);
+
+  const postSaved = await post.save();
+
+  const json = postSaved.toJSON();
+
+  json.liked = true;
+  json.likes = json.likes.length;
+
+  res.send({ post: json });
+}
+
+export async function unlike(req, res) {
+  const post = await Post.findById(req.params.id);
+
+  const index = post.likes.indexOf(req.AUTH.USER_ID);
+
+  post.likes.splice(index, 1);
+
+  const postSaved = await post.save();
+
+  const json = post.toJSON();
+
+  json.liked = false;
+  json.likes = json.likes.length;
+
+  res.send({ post: postSaved });
+}
+
+/* export async function deletePost(req, res) {
   const post = await Post.findByIdAndDelete(req.params.id);
 
   try {
@@ -32,10 +75,10 @@ export async function deletePost(req, res) {
   } finally {
     res.json({ post });
   }
-}
+} */
 
-export async function deleteAllPosts(req, res) {
-  const posts = await Posts.deleteMany({});
+/* export async function deleteAllPosts(req, res) {
+  const posts = await Post.deleteMany({});
 
   for (const post of posts) {
     try {
@@ -46,7 +89,7 @@ export async function deleteAllPosts(req, res) {
   }
 
   res.json({ posts });
-}
+} */
 
 export async function createPost(req, res) {
   const tmpFile = req.files.file,

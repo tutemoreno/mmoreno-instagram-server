@@ -130,6 +130,6 @@ export async function googleSignIn(req, res) {
 
 function buildToken(_id) {
   return jwt.sign({ _id }, 'mmoreno-app', {
-    expiresIn: 3600, // 1h
+    expiresIn: 86400, // 24h
   });
 }
