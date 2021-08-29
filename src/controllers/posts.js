@@ -1,6 +1,5 @@
-import Post from '../models/post.js';
-
 import path from 'path';
+import Post from '../models/post.js';
 
 const __dirname = path.resolve();
 
